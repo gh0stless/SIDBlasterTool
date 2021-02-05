@@ -118,14 +118,15 @@ int main()
 	// check version & device count
 	int DLL_Version = (int)HardSID_Version();
 	cout << "hardsid.dll version: " << DLL_Version << endl;
-	if (DLL_Version < 0x0202) {
+	if (DLL_Version < 0x0203) {
 		cout << "to old hardsid.dll Version" << endl;
+		cout << "version 0x203 (515) at least!" << endl;
 		if (hardsiddll != 0) FreeLibrary(hardsiddll);
 		return 9;
 	}
 	int Number_Of_Devices = (int)HardSID_Devices();
 	cout << "Number of devices: " << Number_Of_Devices << endl;
-	if ((DLL_Version >= 0x0202) && (Number_Of_Devices > 0)) {
+	if ((DLL_Version >= 0x0203) && (Number_Of_Devices > 0)) {
 		int choice = 0;
 		for (;;) {
 			choice = show_menue();
@@ -143,7 +144,7 @@ int main()
 		}
 	}
 	else {
-		cout << "no Sidblaster(s), or not dll version 0x202 (514) at least!" << endl;
+		cout << "no Sidblaster(s), or not dll version 0x203 (515) at least!" << endl;
 		if (hardsiddll != 0) FreeLibrary(hardsiddll);
 		return 8;
 	}
