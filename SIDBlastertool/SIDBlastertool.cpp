@@ -13,21 +13,25 @@ typedef unsigned char  Uint8;
 typedef unsigned short Uint16;
 typedef unsigned char  boolean;
 
+enum SID_TYPE {
+	SID_TYPE_NONE = 0, SID_TYPE_6581, SID_TYPE_8580
+};
+
 typedef Uint8(CALLBACK* lpHardSID_Read)(Uint8 DeviceID, int Cycles, Uint8 SID_reg);
 typedef Uint8(CALLBACK* lpReadFromHardSID)(Uint8 DeviceID, Uint8 SID_reg);
 typedef int  (CALLBACK* lpHardSID_Version)(void);
 typedef int  (CALLBACK* lpHardSID_Devices)(void);
 typedef void (CALLBACK* lpHardSID_GetSerial)(Uint8 DevieID, char* output);
-typedef void (CALLBACK* lpHardSID_SetSIDInfo)(Uint8 DeviceID, int sidtype);
-typedef int (CALLBACK* lpHardSID_GetSIDInfo)(Uint8 DeviceID);
+typedef void (CALLBACK* lpHardSID_SetSIDType)(Uint8 DeviceID, SID_TYPE sidtype);
+typedef SID_TYPE (CALLBACK* lpHardSID_GetSIDType)(Uint8 DeviceID);
 
 lpHardSID_Read HardSID_Read = NULL;
 lpReadFromHardSID HardSID_ReadFromHardSID = NULL;
 lpHardSID_Version HardSID_Version = NULL;
 lpHardSID_Devices HardSID_Devices = NULL;
 lpHardSID_GetSerial HardSID_GetSerial = NULL;
-lpHardSID_SetSIDInfo HardSID_SetSIDInfo = NULL;
-lpHardSID_GetSIDInfo HardSID_GetSIDInfo = NULL;
+lpHardSID_SetSIDType HardSID_SetSIDType = NULL;
+lpHardSID_GetSIDType HardSID_GetSIDType = NULL;
 
 HINSTANCE hardsiddll = 0;
 BOOL dll_initialized = FALSE;
@@ -39,7 +43,7 @@ void list_devices(int No_Of_Dev) {
 		char serial[9];
 		HardSID_GetSerial((Uint8)i, serial);
 		cout << "Device No. " << (int)i << " Serial: " << serial;
-		cout << "  SIDType: " << HardSID_GetSIDInfo(i) << endl;
+		cout << "  SIDType: " << HardSID_GetSIDType(i) << endl;
 	}
 }
 
@@ -71,7 +75,7 @@ void set_the_type(int No_Of_Dev) {
 	cin >> sure;
 	
 	if (sure == 'y' && (Prog_Type <= 2 && Prog_Type >= 0) && (Dev_To_Prog < No_Of_Dev)) {
-		HardSID_SetSIDInfo(Dev_To_Prog, Prog_Type);
+		HardSID_SetSIDType(Dev_To_Prog, SID_TYPE(Prog_Type));
 		cout << "*************************************************" << endl;
 		cout << " done! exit tool and reconnect SIDBlaster!!!!!! *" << endl;
 		cout << "*************************************************" << endl;
@@ -112,8 +116,8 @@ int main()
 	HardSID_Version = (lpHardSID_Version)GetProcAddress(hardsiddll, "HardSID_Version");
 	HardSID_Devices = (lpHardSID_Devices)GetProcAddress(hardsiddll, "HardSID_Devices");
 	HardSID_GetSerial = (lpHardSID_GetSerial)GetProcAddress(hardsiddll, "HardSID_GetSerial");
-	HardSID_SetSIDInfo = (lpHardSID_SetSIDInfo)GetProcAddress(hardsiddll, "HardSID_SetSIDInfo");
-	HardSID_GetSIDInfo = (lpHardSID_GetSIDInfo)GetProcAddress(hardsiddll, "HardSID_GetSIDInfo");
+	HardSID_SetSIDType = (lpHardSID_SetSIDType)GetProcAddress(hardsiddll, "HardSID_SetSIDType");
+	HardSID_GetSIDType = (lpHardSID_GetSIDType)GetProcAddress(hardsiddll, "HardSID_GetSIDType");
 	
 	// check version & device count
 	int DLL_Version = (int)HardSID_Version();
