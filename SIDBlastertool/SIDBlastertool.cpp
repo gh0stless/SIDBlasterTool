@@ -21,9 +21,9 @@ typedef Uint8(CALLBACK* lpHardSID_Read)(Uint8 DeviceID, int Cycles, Uint8 SID_re
 typedef Uint8(CALLBACK* lpReadFromHardSID)(Uint8 DeviceID, Uint8 SID_reg);
 typedef int  (CALLBACK* lpHardSID_Version)(void);
 typedef int  (CALLBACK* lpHardSID_Devices)(void);
-typedef void (CALLBACK* lpHardSID_GetSerial)(Uint8 DevieID, char* output);
-typedef void (CALLBACK* lpHardSID_SetSIDType)(Uint8 DeviceID, SID_TYPE sidtype);
-typedef SID_TYPE (CALLBACK* lpHardSID_GetSIDType)(Uint8 DeviceID);
+typedef void (CALLBACK* lpHardSID_GetSerial)(char* output, int buffersize, Uint8 DeviceID);
+typedef int (CALLBACK* lpHardSID_SetSIDType)(Uint8 DeviceID, int sidtype);
+typedef int (CALLBACK* lpHardSID_GetSIDType)(Uint8 DeviceID);
 
 lpHardSID_Read HardSID_Read = NULL;
 lpReadFromHardSID HardSID_ReadFromHardSID = NULL;
@@ -41,7 +41,7 @@ void list_devices(int No_Of_Dev) {
 	
 	for (Uint8 i = 0; i < No_Of_Dev; i++) {
 		char serial[9];
-		HardSID_GetSerial((Uint8)i, serial);
+		HardSID_GetSerial(serial, 9,(Uint8)i);
 		cout << "Device No. " << (int)i << " Serial: " << serial;
 		cout << "  SIDType: " << HardSID_GetSIDType(i) << endl;
 	}

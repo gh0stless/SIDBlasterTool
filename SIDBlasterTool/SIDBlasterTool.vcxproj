@@ -22,7 +22,7 @@
     <VCProjectVersion>16.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
     <ProjectGuid>{0ee51741-a1e2-4fd5-bfe8-b17a53cc20ce}</ProjectGuid>
-    <RootNamespace>SimpleSIDTest</RootNamespace>
+    <RootNamespace>SIDBlasterTool</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
     <ProjectName>SIDBlastertool</ProjectName>
   </PropertyGroup>
