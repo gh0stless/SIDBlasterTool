@@ -15,7 +15,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="SIDBlasterTool.cpp">
+    <ClCompile Include="..\SIDBlasterTool\SIDBlasterTool.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
   </ItemGroup>
