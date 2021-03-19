@@ -3,7 +3,7 @@
 
 #include <iostream>
 //#include "stdafx.h"
-#ifdef WIN32 
+#if defined(_WIN64) || defined(_WIN32) 
 #include <windows.h>
 #endif
 #include <inttypes.h>
@@ -22,7 +22,7 @@ enum SID_TYPE {
 	SID_TYPE_NONE = 0, SID_TYPE_6581, SID_TYPE_8580
 };
 
-#ifdef WIN32 
+#if defined(_WIN64) || defined(_WIN32) 
 typedef Uint8(CALLBACK* lpHardSID_Read)(Uint8 DeviceID, int Cycles, Uint8 SID_reg);
 typedef Uint8(CALLBACK* lpReadFromHardSID)(Uint8 DeviceID, Uint8 SID_reg);
 typedef int  (CALLBACK* lpHardSID_Version)(void);
@@ -119,7 +119,7 @@ int main()
 	cout << "*** SIDBlasterTool 1.1 by A. Schumm for crazy-midi.de" << endl;
 	cout << endl;
 	
-	#ifdef WIN32
+#if defined(_WIN64) || defined(_WIN32) 
 	hardsiddll = LoadLibrary("hardsid.dll");
 	
 	if (hardsiddll != 0) {
@@ -137,19 +137,19 @@ int main()
 	HardSID_GetSerial = (lpHardSID_GetSerial)GetProcAddress(hardsiddll, "HardSID_GetSerial");
 	HardSID_SetSIDType = (lpHardSID_SetSIDType)GetProcAddress(hardsiddll, "HardSID_SetSIDType");
 	HardSID_GetSIDType = (lpHardSID_GetSIDType)GetProcAddress(hardsiddll, "HardSID_GetSIDType");
-	#endif
+#endif
 	
 	// check version & device count
 	int DLL_Version = (int)HardSID_Version();
 	cout << "hardsid.dll version: " << DLL_Version << endl;
-	#ifdef WIN32
+#if defined(_WIN64) || defined(_WIN32) 
 	if (DLL_Version < 0x0203) {
 		cout << "to old hardsid.dll Version" << endl;
 		cout << "version 0x203 (515) at least!" << endl;
 		if (hardsiddll != 0) FreeLibrary(hardsiddll);
 		return 9;
 	}
-	#endif
+#endif
 	
 	int Number_Of_Devices = (int)HardSID_Devices();
 	cout << "Number of devices: " << Number_Of_Devices << endl;
@@ -172,12 +172,12 @@ int main()
 	}
 	else {
 		cout << "no Sidblaster(s), or not dll version 0x203 (515) at least!" << endl;
-#ifdef WIN32
+#if defined(_WIN64) || defined(_WIN32) 
 		if (hardsiddll != 0) FreeLibrary(hardsiddll);
 #endif
 		return 8;
 	}
-#ifdef WIN32
+#if defined(_WIN64) || defined(_WIN32) 
 	if (hardsiddll != 0) FreeLibrary(hardsiddll);
 #endif
 	return 0;
