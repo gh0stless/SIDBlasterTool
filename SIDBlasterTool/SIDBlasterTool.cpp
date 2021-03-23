@@ -2,13 +2,15 @@
 // ©2021 by Andreas Schumm for crazy-midi.de
 
 #include <iostream>
-//#include "stdafx.h"
-#if defined(_WIN64) || defined(_WIN32) 
+
+#if defined(_WIN64) || defined(_WIN32)
 #include <windows.h>
 #endif
+
 #include <inttypes.h>
 #include <chrono>
-#ifdef linux
+
+#if defined(__linux) || defined(__APPLE__)
 #include "libhardsid.h"
 #endif
 
@@ -114,8 +116,10 @@ int show_menue(void) {
 	return choice;
 }
 
-int main()
-{
+
+
+int main(int argc, const char * argv[]) {
+
 	cout << "*** SIDBlasterTool 1.1 by A. Schumm for crazy-midi.de" << endl;
 	cout << endl;
 	
