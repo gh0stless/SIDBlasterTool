@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		E163C6B7260942240038F0AF /* SIDBlasterTool.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E163C6B6260942240038F0AF /* SIDBlasterTool.cpp */; };
+		E166D18426191E1F00D9F823 /* SIDBlasterTool.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E166D18326191E1F00D9F823 /* SIDBlasterTool.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -23,10 +23,9 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		E163C6AC26093F700038F0AF /* SIDBlasterTool */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = SIDBlasterTool; sourceTree = BUILT_PRODUCTS_DIR; };
-		E163C6B6260942240038F0AF /* SIDBlasterTool.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SIDBlasterTool.cpp; sourceTree = "<group>"; };
-		E163C6B8260943170038F0AF /* libhardsid.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = libhardsid.h; sourceTree = "<group>"; };
-		E163C6BA26094CAD0038F0AF /* libhardsid.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libhardsid.dylib; path = /Users/andreas/Desktop/Projekte/SIDBlasterTool/SIDBlasterTool/libhardsid.dylib; sourceTree = "<absolute>"; };
+		E163C6AC26093F700038F0AF /* MacOS */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; name = MacOS; path = ../../../../../../MacOS; sourceTree = BUILT_PRODUCTS_DIR; };
+		E166D18226191E1F00D9F823 /* hardsid.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = hardsid.hpp; path = source/hardsid.hpp; sourceTree = SOURCE_ROOT; };
+		E166D18326191E1F00D9F823 /* SIDBlasterTool.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SIDBlasterTool.cpp; path = source/SIDBlasterTool.cpp; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -51,7 +50,7 @@
 		E163C6AD26093F700038F0AF /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				E163C6AC26093F700038F0AF /* SIDBlasterTool */,
+				E163C6AC26093F700038F0AF /* MacOS */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -59,11 +58,11 @@
 		E163C6AE26093F700038F0AF /* SIDBlasterTool */ = {
 			isa = PBXGroup;
 			children = (
-				E163C6B8260943170038F0AF /* libhardsid.h */,
-				E163C6BA26094CAD0038F0AF /* libhardsid.dylib */,
-				E163C6B6260942240038F0AF /* SIDBlasterTool.cpp */,
+				E166D18226191E1F00D9F823 /* hardsid.hpp */,
+				E166D18326191E1F00D9F823 /* SIDBlasterTool.cpp */,
 			);
-			path = SIDBlasterTool;
+			name = SIDBlasterTool;
+			path = source;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -83,7 +82,7 @@
 			);
 			name = SIDBlasterTool;
 			productName = SIDBlasterTool;
-			productReference = E163C6AC26093F700038F0AF /* SIDBlasterTool */;
+			productReference = E163C6AC26093F700038F0AF /* MacOS */;
 			productType = "com.apple.product-type.tool";
 		};
 /* End PBXNativeTarget section */
@@ -92,8 +91,8 @@
 		E163C6A426093F700038F0AF /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 1030;
-				ORGANIZATIONNAME = "Andreas Schumm";
+				LastUpgradeCheck = 1240;
+				ORGANIZATIONNAME = "crazy-midi.de";
 				TargetAttributes = {
 					E163C6AB26093F700038F0AF = {
 						CreatedOnToolsVersion = 10.3;
@@ -106,6 +105,7 @@
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				en,
+				Base,
 			);
 			mainGroup = E163C6A326093F700038F0AF;
 			productRefGroup = E163C6AD26093F700038F0AF /* Products */;
@@ -122,7 +122,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				E163C6B7260942240038F0AF /* SIDBlasterTool.cpp in Sources */,
+				E166D18426191E1F00D9F823 /* SIDBlasterTool.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -155,6 +155,7 @@
 				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
 				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
@@ -180,10 +181,11 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.15;
+				MACOSX_DEPLOYMENT_TARGET = 10.14;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
+				OTHER_LDFLAGS = libhardsid.dylib;
 				SDKROOT = macosx;
 			};
 			name = Debug;
@@ -214,6 +216,7 @@
 				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
 				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
@@ -233,9 +236,10 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.15;
+				MACOSX_DEPLOYMENT_TARGET = 10.14;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
+				OTHER_LDFLAGS = libhardsid.dylib;
 				SDKROOT = macosx;
 			};
 			name = Release;
@@ -244,9 +248,12 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
+				EXCLUDED_ARCHS = "";
 				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				ONLY_ACTIVE_ARCH = YES;
 				OTHER_LDFLAGS = /usr/local/lib/libhardsid.dylib;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SYMROOT = build;
 			};
 			name = Debug;
 		};
@@ -254,9 +261,12 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
+				EXCLUDED_ARCHS = "";
 				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				ONLY_ACTIVE_ARCH = YES;
 				OTHER_LDFLAGS = /usr/local/lib/libhardsid.dylib;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SYMROOT = build;
 			};
 			name = Release;
 		};

@@ -6,13 +6,17 @@
 	<string>UseAppPreferences</string>
 	<key>CustomBuildLocationType</key>
 	<string>RelativeToDerivedData</string>
+	<key>DerivedDataCustomLocation</key>
+	<string>/Users/andreas/Desktop/Projekte/SIDBlasterTool/build/MacOS</string>
 	<key>DerivedDataLocationStyle</key>
-	<string>Default</string>
+	<string>AbsolutePath</string>
 	<key>EnabledFullIndexStoreVisibility</key>
 	<false/>
 	<key>IssueFilterStyle</key>
 	<string>ShowActiveSchemeOnly</string>
 	<key>LiveSourceIssuesEnabled</key>
+	<true/>
+	<key>ShowSharedSchemesAutomaticallyEnabled</key>
 	<true/>
 </dict>
 </plist>
