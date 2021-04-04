@@ -2,12 +2,6 @@
 <Workspace
    version = "1.0">
    <FileRef
-      location = "group:../SIDBlasterTool/libhardsid.so">
-   </FileRef>
-   <FileRef
-      location = "group:/Users/andreas/Desktop/Projekte/SIDBlasterTool/SIDBlasterTool/libhardsid.dylib">
-   </FileRef>
-   <FileRef
       location = "self:">
    </FileRef>
 </Workspace>

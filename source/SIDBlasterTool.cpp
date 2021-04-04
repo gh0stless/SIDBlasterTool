@@ -1,6 +1,6 @@
 // SIDBlastertool.cpp
 // ©2021 by Andreas Schumm for crazy-midi.de
-// 2021-04-05 v1.1
+// 2021-04-04 v1.2
 
 #include <iostream>
 
@@ -31,8 +31,9 @@ typedef Uint8(CALLBACK* lpReadFromHardSID)(Uint8 DeviceID, Uint8 SID_reg);
 typedef int  (CALLBACK* lpHardSID_Version)(void);
 typedef int  (CALLBACK* lpHardSID_Devices)(void);
 typedef void (CALLBACK* lpHardSID_GetSerial)(char* output, int buffersize, Uint8 DeviceID);
-typedef int (CALLBACK* lpHardSID_SetSIDType)(Uint8 DeviceID, int sidtype);
-typedef int (CALLBACK* lpHardSID_GetSIDType)(Uint8 DeviceID);
+typedef int  (CALLBACK* lpHardSID_SetSIDType)(Uint8 DeviceID, int sidtype);
+typedef int  (CALLBACK* lpHardSID_GetSIDType)(Uint8 DeviceID);
+typedef int  (CALLBACK* lpHardSID_SetSerial)(Uint8 DeviceID, const char *SerialNo);
 
 lpHardSID_Read HardSID_Read = NULL;
 lpReadFromHardSID HardSID_ReadFromHardSID = NULL;
@@ -41,6 +42,7 @@ lpHardSID_Devices HardSID_Devices = NULL;
 lpHardSID_GetSerial HardSID_GetSerial = NULL;
 lpHardSID_SetSIDType HardSID_SetSIDType = NULL;
 lpHardSID_GetSIDType HardSID_GetSIDType = NULL;
+lpHardSID_SetSerial HardSID_SetSerial = NULL;
 
 HINSTANCE hardsiddll = 0;
 
@@ -83,6 +85,7 @@ void set_the_type(int No_Of_Dev) {
 	int Dev_To_Prog = 0;
 	int Prog_Type = 0;
 	char sure;
+    int error_code = 0;
 	
 	list_devices(No_Of_Dev);
 	
@@ -94,15 +97,59 @@ void set_the_type(int No_Of_Dev) {
 	cout << "sure? (y/n)" << endl;
 	cin >> sure;
 	
-	if (sure == 'y' && (Prog_Type <= 2 && Prog_Type >= 0) && (Dev_To_Prog < No_Of_Dev)) {
-		HardSID_SetSIDType(Dev_To_Prog, SID_TYPE(Prog_Type));
+	if (sure == 'y' && (Prog_Type <= 2 && Prog_Type >= 0) && (Dev_To_Prog< No_Of_Dev)) {
+		error_code = HardSID_SetSIDType(Dev_To_Prog, SID_TYPE(Prog_Type));
+        
+        if (error_code){
+            cout << "Function reports error!" << endl;
+        }
+        else{
+            cout << "Well, done!" << endl;
+        }
+        
 		cout << "*************************************************" << endl;
 		cout << " done! exit tool and reconnect SIDBlaster!!!!!! *" << endl;
 		cout << "*************************************************" << endl;
+        
 	}
 	else {
 		cout << "ERROR!" << endl;
 	}
+}
+
+void set_the_serial(int No_Of_Dev) {
+    int Dev_To_Prog = 0;
+    char new_serial[9];
+    char sure;
+    int error_code = 0;
+    
+    list_devices(No_Of_Dev);
+    
+    cout << endl;
+    cout << "which device? (No.)" << endl;
+    cin >> Dev_To_Prog;
+    cout << "which serial?" << endl;
+    cin >> new_serial;
+    cout << "sure? (y/n)" << endl;
+    cin >> sure;
+    
+    if (sure == 'y' && (Dev_To_Prog < No_Of_Dev)) {
+        error_code = HardSID_SetSerial(Dev_To_Prog, new_serial);
+        
+        if (error_code){
+            cout << "Function reports error!" << endl;
+        }
+        else{
+            cout << "Well, done!" << endl;
+        }
+        
+        cout << "*************************************************" << endl;
+        cout << " done! exit tool and reconnect SIDBlaster!!!!!! *" << endl;
+        cout << "*************************************************" << endl;
+    }
+    else {
+        cout << "ERROR!" << endl;
+    }
 }
 
 int show_menue(void) {
@@ -112,7 +159,8 @@ int show_menue(void) {
 	cout << "1 list sidblasters" << endl;
 	cout << "2 read test" << endl;
 	cout << "3 set sid type" << endl;
-	cout << "9 exit" << endl;
+    cout << "4 set serial" << endl;
+    cout << "9 exit" << endl;
 	cin >> choice;
 	return choice;
 }
@@ -121,17 +169,17 @@ int show_menue(void) {
 
 int main(int argc, const char * argv[]) {
 
-	cout << "*** SIDBlasterTool 1.1 by A. Schumm for crazy-midi.de" << endl;
+	cout << "*** SIDBlasterTool 1.2 by A. Schumm for crazy-midi.de" << endl;
 	cout << endl;
 	
 #if defined(_WIN64) || defined(_WIN32) 
 	hardsiddll = LoadLibrary("hardsid.dll");
 	
 	if (hardsiddll != 0) {
-		cout << "hardsid.dll library loaded!" << endl;
+		cout << "hardsid library loaded!" << endl;
 	}
 	else {
-		cout << "hardsid.dll library failed to load!" << endl;
+		cout << "hardsid library failed to load!" << endl;
 		return 10;
 	}
 
@@ -142,14 +190,15 @@ int main(int argc, const char * argv[]) {
 	HardSID_GetSerial = (lpHardSID_GetSerial)GetProcAddress(hardsiddll, "HardSID_GetSerial");
 	HardSID_SetSIDType = (lpHardSID_SetSIDType)GetProcAddress(hardsiddll, "HardSID_SetSIDType");
 	HardSID_GetSIDType = (lpHardSID_GetSIDType)GetProcAddress(hardsiddll, "HardSID_GetSIDType");
+    HardSID_SetSerial = (lpHardSID_SetSerial)GetProcAddress(hardsiddll, "HardSID_SetSerial");
 #endif
 	
 	// check version & device count
 	int DLL_Version = (int)HardSID_Version();
-	cout << "hardsid.dll version: " << DLL_Version << endl;
+	cout << "hardsid library version: " << DLL_Version << endl;
 #if defined(_WIN64) || defined(_WIN32) 
 	if (DLL_Version < 0x0203) {
-		cout << "to old hardsid.dll Version" << endl;
+		cout << "to old hardsid library Version" << endl;
 		cout << "version 0x203 (515) at least!" << endl;
 		if (hardsiddll != 0) FreeLibrary(hardsiddll);
 		return 9;
@@ -170,13 +219,15 @@ int main(int argc, const char * argv[]) {
 				break;
 			case 3:	set_the_type(Number_Of_Devices);
 				break;
+            case 4: set_the_serial(Number_Of_Devices);
+                    break;
 			case 9: 
 				break;
 			}
 		}
 	}
 	else {
-		cout << "no Sidblaster(s), or not dll version 0x203 (515) at least!" << endl;
+		cout << "no Sidblaster(s), or not library version 0x203 (515) at least!" << endl;
 #if defined(_WIN64) || defined(_WIN32) 
 		if (hardsiddll != 0) FreeLibrary(hardsiddll);
 #endif

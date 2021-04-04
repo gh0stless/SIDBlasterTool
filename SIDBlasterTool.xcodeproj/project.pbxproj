@@ -23,7 +23,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		E163C6AC26093F700038F0AF /* MacOS */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; name = MacOS; path = ../../../../../../MacOS; sourceTree = BUILT_PRODUCTS_DIR; };
+		E163C6AC26093F700038F0AF /* SIDBlasterTool */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; name = SIDBlasterTool; path = ../Release/SIDBlasterTool; sourceTree = BUILT_PRODUCTS_DIR; };
 		E166D18226191E1F00D9F823 /* hardsid.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = hardsid.hpp; path = source/hardsid.hpp; sourceTree = SOURCE_ROOT; };
 		E166D18326191E1F00D9F823 /* SIDBlasterTool.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SIDBlasterTool.cpp; path = source/SIDBlasterTool.cpp; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
@@ -42,7 +42,7 @@
 		E163C6A326093F700038F0AF = {
 			isa = PBXGroup;
 			children = (
-				E163C6AE26093F700038F0AF /* SIDBlasterTool */,
+				E163C6AE26093F700038F0AF /* source */,
 				E163C6AD26093F700038F0AF /* Products */,
 			);
 			sourceTree = "<group>";
@@ -50,20 +50,20 @@
 		E163C6AD26093F700038F0AF /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				E163C6AC26093F700038F0AF /* MacOS */,
+				E163C6AC26093F700038F0AF /* SIDBlasterTool */,
 			);
 			name = Products;
-			sourceTree = "<group>";
+			path = ..;
+			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		E163C6AE26093F700038F0AF /* SIDBlasterTool */ = {
+		E163C6AE26093F700038F0AF /* source */ = {
 			isa = PBXGroup;
 			children = (
 				E166D18226191E1F00D9F823 /* hardsid.hpp */,
 				E166D18326191E1F00D9F823 /* SIDBlasterTool.cpp */,
 			);
-			name = SIDBlasterTool;
 			path = source;
-			sourceTree = "<group>";
+			sourceTree = SOURCE_ROOT;
 		};
 /* End PBXGroup section */
 
@@ -82,7 +82,7 @@
 			);
 			name = SIDBlasterTool;
 			productName = SIDBlasterTool;
-			productReference = E163C6AC26093F700038F0AF /* MacOS */;
+			productReference = E163C6AC26093F700038F0AF /* SIDBlasterTool */;
 			productType = "com.apple.product-type.tool";
 		};
 /* End PBXNativeTarget section */
