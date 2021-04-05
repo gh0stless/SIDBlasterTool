@@ -55,7 +55,7 @@ void list_devices(int No_Of_Dev) {
 	
 	for (Uint8 i = 0; i < No_Of_Dev; i++) {
 		char serial[9];
-		HardSID_GetSerial(serial, 9,(Uint8)i);
+        HardSID_GetSerial(serial, 9,(Uint8)i);
 		cout << "Device No. " << (int)i << " Serial: " << serial;
 		cout << "  SIDType: " << HardSID_GetSIDType(i);
 		switch (HardSID_GetSIDType(i)){
