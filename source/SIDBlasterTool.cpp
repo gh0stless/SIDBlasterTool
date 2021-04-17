@@ -1,8 +1,14 @@
 // SIDBlastertool.cpp
 // ©2021 by Andreas Schumm for crazy-midi.de
-// 2021-04-04 v1.2
+// 2021-04-17 v1.3
 
 #include <iostream>
+#include <cstring>
+#include <string>
+#include <regex>
+#include <chrono>
+#include <thread>
+
 
 #if defined(_WIN64) || defined(_WIN32)
 #include <windows.h>
@@ -101,19 +107,19 @@ void set_the_type(int No_Of_Dev) {
 		error_code = HardSID_SetSIDType(Dev_To_Prog, SID_TYPE(Prog_Type));
         
         if (error_code){
-            cout << "Function reports error!" << endl;
+            cout << "function reports error!" << endl;
         }
         else{
-            cout << "Well, done!" << endl;
+            cout << "well, done!" << endl;
         }
-        
+		cout << endl;
 		cout << "*************************************************" << endl;
 		cout << " done! exit tool and reconnect SIDBlaster!!!!!! *" << endl;
 		cout << "*************************************************" << endl;
         
 	}
 	else {
-		cout << "ERROR!" << endl;
+		cout << "cancel..." << endl;
 	}
 }
 
@@ -122,46 +128,111 @@ void set_the_serial(int No_Of_Dev) {
     char new_serial[9];
     char sure;
     int error_code = 0;
-    
+	string s_new_serial;
+
     list_devices(No_Of_Dev);
     
     cout << endl;
     cout << "which device? (No.)" << endl;
     cin >> Dev_To_Prog;
-    cout << "which serial?" << endl;
-    cin >> new_serial;
-    cout << "sure? (y/n)" << endl;
-    cin >> sure;
-    
-    if (sure == 'y' && (Dev_To_Prog < No_Of_Dev)) {
-        error_code = HardSID_SetSerial(Dev_To_Prog, new_serial);
-        
-        if (error_code){
-            cout << "Function reports error!" << endl;
-        }
-        else{
-            cout << "Well, done!" << endl;
-        }
-        
-        cout << "*************************************************" << endl;
-        cout << " done! exit tool and reconnect SIDBlaster!!!!!! *" << endl;
-        cout << "*************************************************" << endl;
-    }
-    else {
-        cout << "ERROR!" << endl;
-    }
+    cout << "enter serial (8 digits, capital letters or numbers):" << endl;
+    cin >> s_new_serial;
+	
+	std::string regExprStr("([A-Z]|\\d){8}"); // regular expression
+	std::regex rgx(regExprStr); // regular expression holder
+	std::smatch smatch; // search result holder
+	if (std::regex_match(s_new_serial, smatch, rgx)) {
+		#pragma warning(suppress : 4996)
+		std::strcpy(new_serial, s_new_serial.c_str());
+
+		cout << "sure? (y/n)" << endl;
+		cin >> sure;
+
+		if (sure == 'y' && (Dev_To_Prog < No_Of_Dev)) {
+			error_code = HardSID_SetSerial(Dev_To_Prog, new_serial);
+
+			if (error_code) {
+				cout << "function reports error!" << endl;
+			}
+			else {
+				cout << "well, done!" << endl;
+			}
+			cout << endl;
+			cout << "*************************************************" << endl;
+			cout << " done! exit tool and reconnect SIDBlaster!!!!!! *" << endl;
+			cout << "*************************************************" << endl;
+		}
+		else {
+			cout << "cancel..." << endl;
+		}
+	}
+	else {
+		cout << "invalid serial" << endl;
+	}
+
+}
+
+void windows_fix(int No_Of_Dev) {
+	int Dev_To_Prog = 0;
+	int Prog_Type = 0;
+	char sure;
+	int error_code = 0;
+
+	list_devices(No_Of_Dev);
+
+	cout << endl;
+	cout << "only necessary if the serial number or chip type was written under linux or macos" << endl;
+	cout << "and the sidblaster is to be used under windows again." << endl;
+	
+	cout << "sure? (y/n)" << endl;
+	cin >> sure;
+	if (sure != 'y') return;
+
+	cout << "which device? (No.)" << endl;
+	cin >> Dev_To_Prog;
+	
+	cout << "sure? (y/n)" << endl;
+	cin >> sure;
+
+	if ((sure == 'y') && (Dev_To_Prog < No_Of_Dev)) {
+		
+		
+		Prog_Type = HardSID_GetSIDType(Dev_To_Prog);
+
+		std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+		
+		error_code = HardSID_SetSIDType(Dev_To_Prog, SID_TYPE(Prog_Type));
+
+		if (error_code) {
+			cout << "function reports error!" << endl;
+		}
+		else {
+			cout << "well, done!" << endl;
+		}
+		cout << endl;
+		cout << "*************************************************" << endl;
+		cout << " done! exit tool and reconnect SIDBlaster!!!!!! *" << endl;
+		cout << "*************************************************" << endl;
+
+	}
+	else {
+		cout << "cancel..." << endl;
+	}
+
 }
 
 int show_menue(void) {
 	int choice = 0;
 	cout << endl;
-	cout << "Enter:" << endl;
+	cout << "enter:" << endl;
 	cout << "1 list sidblasters" << endl;
 	cout << "2 read test" << endl;
 	cout << "3 set sid type" << endl;
     cout << "4 set serial" << endl;
+	cout << "5 windows driver fix" << endl;
     cout << "9 exit" << endl;
 	cin >> choice;
+	if (!(choice >= 1 && choice <= 9)) choice = 9;
 	return choice;
 }
 
@@ -169,7 +240,7 @@ int show_menue(void) {
 
 int main(int argc, const char * argv[]) {
 
-	cout << "*** SIDBlasterTool 1.2 by A. Schumm for crazy-midi.de" << endl;
+	cout << "*** SIDBlasterTool 1.3 by A. Schumm for crazy-midi.de" << endl;
 	cout << endl;
 	
 #if defined(_WIN64) || defined(_WIN32) 
@@ -208,10 +279,11 @@ int main(int argc, const char * argv[]) {
 	int Number_Of_Devices = (int)HardSID_Devices();
 	cout << "Number of devices: " << Number_Of_Devices << endl;
 	if ((DLL_Version >= 0x0203) && (Number_Of_Devices > 0)) {
-		int choice = 0;
+		
 		for (;;) {
+			int choice = 0;
 			choice = show_menue();
-			if (choice == 9) break;
+			if ((choice == 9) || (choice > 5)) break;
 			switch (choice) {
 			case 1: list_devices(Number_Of_Devices);
 				break;
@@ -221,10 +293,12 @@ int main(int argc, const char * argv[]) {
 				break;
             case 4: set_the_serial(Number_Of_Devices);
                     break;
-			case 9: 
+			case 5: windows_fix(Number_Of_Devices);
+			default:
 				break;
 			}
 		}
+		cout << "exit..." << endl;
 	}
 	else {
 		cout << "no Sidblaster(s), or not library version 0x203 (515) at least!" << endl;
