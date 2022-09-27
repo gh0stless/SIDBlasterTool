@@ -1,6 +1,6 @@
 // SIDBlastertool.cpp
-// ©2021 by Andreas Schumm for crazy-midi.de
-// 2021-04-17 v1.3
+// ©2021-2022 by Andreas Schumm for crazy-midi.de
+// 2022-09-27 v1.4
 
 #include <iostream>
 #include <cstring>
@@ -15,7 +15,6 @@
 #endif
 
 #include <inttypes.h>
-#include <chrono>
 
 #if defined(__linux) || defined(__APPLE__)
 #include "hardsid.hpp"
@@ -31,30 +30,86 @@ enum SID_TYPE {
 	SID_TYPE_NONE = 0, SID_TYPE_6581, SID_TYPE_8580
 };
 
-#if defined(_WIN64) || defined(_WIN32) 
-typedef Uint8(CALLBACK* lpHardSID_Read)(Uint8 DeviceID, int Cycles, Uint8 SID_reg);
-typedef Uint8(CALLBACK* lpReadFromHardSID)(Uint8 DeviceID, Uint8 SID_reg);
-typedef int  (CALLBACK* lpHardSID_Version)(void);
-typedef int  (CALLBACK* lpHardSID_Devices)(void);
-typedef void (CALLBACK* lpHardSID_GetSerial)(char* output, int buffersize, Uint8 DeviceID);
-typedef int  (CALLBACK* lpHardSID_SetSIDType)(Uint8 DeviceID, int sidtype);
-typedef int  (CALLBACK* lpHardSID_GetSIDType)(Uint8 DeviceID);
-typedef int  (CALLBACK* lpHardSID_SetSerial)(Uint8 DeviceID, const char *SerialNo);
+enum HSID_STATES {
+	HSID_USB_WSTATE_OK = 1, HSID_USB_WSTATE_BUSY,
+	HSID_USB_WSTATE_ERROR, HSID_USB_WSTATE_END
+};
 
-lpHardSID_Read HardSID_Read = NULL;
-lpReadFromHardSID HardSID_ReadFromHardSID = NULL;
-lpHardSID_Version HardSID_Version = NULL;
-lpHardSID_Devices HardSID_Devices = NULL;
-lpHardSID_GetSerial HardSID_GetSerial = NULL;
-lpHardSID_SetSIDType HardSID_SetSIDType = NULL;
-lpHardSID_GetSIDType HardSID_GetSIDType = NULL;
-lpHardSID_SetSerial HardSID_SetSerial = NULL;
+#if defined(_WIN64) || defined(_WIN32) 
+typedef Uint8	(CALLBACK* lpHardSID_Read)(Uint8 DeviceID, int Cycles, Uint8 SID_reg);
+typedef void    (CALLBACK* lpHardSID_Write)(Uint8 DeviceID, Uint16 Cycles, Uint8 SID_reg, Uint8 Data);
+typedef Uint8	(CALLBACK* lpReadFromHardSID)(Uint8 DeviceID, Uint8 SID_reg);
+typedef int		(CALLBACK* lpHardSID_Version)(void);
+typedef int		(CALLBACK* lpHardSID_Devices)(void);
+typedef void	(CALLBACK* lpHardSID_GetSerial)(char* output, int buffersize, Uint8 DeviceID);
+typedef int		(CALLBACK* lpHardSID_SetSIDType)(Uint8 DeviceID, int sidtype);
+typedef int		(CALLBACK* lpHardSID_GetSIDType)(Uint8 DeviceID);
+typedef int		(CALLBACK* lpHardSID_SetSerial)(Uint8 DeviceID, const char *SerialNo);
+typedef Uint8	(CALLBACK* lpHardSID_Try_Write)(Uint8 DeviceID, Uint16 Cycles, Uint8 SID_reg, Uint8 Data);
+typedef void    (CALLBACK* lpHardSID_SoftFlush)(Uint8 DeviceID);
+
+lpHardSID_Read			HardSID_Read			= NULL;
+lpHardSID_Write			HardSID_Write			= NULL;
+lpReadFromHardSID		HardSID_ReadFromHardSID = NULL;
+lpHardSID_Version		HardSID_Version			= NULL;
+lpHardSID_Devices		HardSID_Devices			= NULL;
+lpHardSID_GetSerial		HardSID_GetSerial		= NULL;
+lpHardSID_SetSIDType	HardSID_SetSIDType		= NULL;
+lpHardSID_GetSIDType	HardSID_GetSIDType		= NULL;
+lpHardSID_SetSerial		HardSID_SetSerial		= NULL;
+lpHardSID_Try_Write		HardSID_Try_Write		= NULL;
+lpHardSID_SoftFlush		HardSID_SoftFlush		= NULL;
 
 HINSTANCE hardsiddll = 0;
 
 #endif
 
 boolean dll_initialized = false;
+
+#if defined(_WIN64) || defined(_WIN32) 
+double PCFreq = 0.0;
+__int64 CounterStart = 0;
+
+void StartCounter()
+{
+	LARGE_INTEGER li;
+	if (!QueryPerformanceFrequency(&li))
+		cout << "QueryPerformanceFrequency failed!\n";
+
+	PCFreq = double(li.QuadPart) / 1000.0;
+
+	QueryPerformanceCounter(&li);
+	CounterStart = li.QuadPart;
+}
+double GetCounter()
+{
+	LARGE_INTEGER li;
+	QueryPerformanceCounter(&li);
+	return double(li.QuadPart - CounterStart) / PCFreq;
+}
+
+static NTSTATUS(__stdcall* NtDelayExecution)(BOOL Alertable, PLARGE_INTEGER DelayInterval) = (NTSTATUS(__stdcall*)(BOOL, PLARGE_INTEGER)) GetProcAddress(GetModuleHandle("ntdll.dll"), "NtDelayExecution");
+static NTSTATUS(__stdcall* ZwSetTimerResolution)(IN ULONG RequestedResolution, IN BOOLEAN Set, OUT PULONG ActualResolution) = (NTSTATUS(__stdcall*)(ULONG, BOOLEAN, PULONG)) GetProcAddress(GetModuleHandle("ntdll.dll"), "ZwSetTimerResolution");
+
+static void SleepShort(float milliseconds) {
+	static bool once = true;
+	if (once) {
+		ULONG actualResolution;
+		ZwSetTimerResolution(1, true, &actualResolution);
+		once = false;
+	}
+
+	LARGE_INTEGER interval;
+	interval.QuadPart = -1 * (int)(milliseconds * 10000.0f);
+	NtDelayExecution(false, &interval);
+}
+
+#endif
+
+void push_event(Uint8 My_Device, Uint8 reg, Uint8 val)
+{
+			HardSID_Write(My_Device, 0, reg, val);
+}
 
 void list_devices(int No_Of_Dev) {
 	cout << endl;
@@ -80,10 +135,36 @@ void read_test(int No_Of_Dev) {
 	cout << "SIDBlaster-USB HardSID_Read Test" << endl;
 	
 	for (Uint8 i = 0; i < No_Of_Dev; i++) {
-		for (Uint8 j = 25; j <= 28; j++) {
-			Uint8 result = HardSID_Read(i, 0, j);
-			cout << "SIDBlaster No. " << (int)i << " Register: " << (int)j << " returns: " << (int)result << endl;
-		}
+			for (Uint8 j = 25; j <= 28; j++) {
+				Uint8 result = HardSID_Read(i, 0, j);
+				cout << "SIDBlaster No. " << (int)i << " Register: " << (int)j << " returns: " << (int)result << endl;
+				Sleep(3);
+			}
+#if defined(_WIN64) || defined(_WIN32) 
+			for (double x = 0.0 ; x <= 20; x=x+0.025) {
+				double summe = 0.0;
+				for (int z = 0; z <= 2047; z++) {
+					StartCounter();
+					//HardSID_Write(i, 0, 0, 0x00);
+					Uint8 result = HardSID_Read(i, 0, 25);
+					auto ReadTime = GetCounter();
+					summe = summe + ReadTime;
+					SleepShort(x);
+				}
+				cout << "Durchschnitt bei einer SleepTime von " << x << " ms: " << summe / (2048.0) << endl;
+			}
+#endif
+	}
+}
+
+void fpga_test(int No_Of_Dev) {
+	cout << endl;
+	cout << "FPGA-SID Test" << endl;
+	for (Uint8 i = 0; i < No_Of_Dev; i++) {
+		push_event(i, 25, 0xEE);
+		push_event(i, 26, 0xAB);
+		Sleep(20);
+		cout << "SIDBlaster No. " << (int)i << " result: " << (int) HardSID_Read(i, 0, 0) << ":" << (int)HardSID_Read(i, 0, 1) << endl;
 	}
 }
 
@@ -230,6 +311,7 @@ int show_menue(void) {
 	cout << "3 set sid type" << endl;
     cout << "4 set serial" << endl;
 	cout << "5 windows driver fix" << endl;
+	cout << "6 FPGA SID Test" << endl;
     cout << "9 exit" << endl;
 	cin >> choice;
 	if (!(choice >= 1 && choice <= 9)) choice = 9;
@@ -237,10 +319,9 @@ int show_menue(void) {
 }
 
 
-
 int main(int argc, const char * argv[]) {
 
-	cout << "*** SIDBlasterTool 1.3 by A. Schumm for crazy-midi.de" << endl;
+	cout << "*** SIDBlasterTool 1.4 by A. Schumm for crazy-midi.de" << endl;
 	cout << endl;
 	
 #if defined(_WIN64) || defined(_WIN32) 
@@ -254,14 +335,18 @@ int main(int argc, const char * argv[]) {
 		return 10;
 	}
 
-	HardSID_Read = (lpHardSID_Read)GetProcAddress(hardsiddll, "HardSID_Read");
-	HardSID_ReadFromHardSID = (lpReadFromHardSID)GetProcAddress(hardsiddll, "HardSID_ReadFromHardSID");
-	HardSID_Version = (lpHardSID_Version)GetProcAddress(hardsiddll, "HardSID_Version");
-	HardSID_Devices = (lpHardSID_Devices)GetProcAddress(hardsiddll, "HardSID_Devices");
-	HardSID_GetSerial = (lpHardSID_GetSerial)GetProcAddress(hardsiddll, "HardSID_GetSerial");
-	HardSID_SetSIDType = (lpHardSID_SetSIDType)GetProcAddress(hardsiddll, "HardSID_SetSIDType");
-	HardSID_GetSIDType = (lpHardSID_GetSIDType)GetProcAddress(hardsiddll, "HardSID_GetSIDType");
-    HardSID_SetSerial = (lpHardSID_SetSerial)GetProcAddress(hardsiddll, "HardSID_SetSerial");
+	HardSID_Read			= (lpHardSID_Read)			GetProcAddress(hardsiddll, "HardSID_Read");
+	HardSID_Write			= (lpHardSID_Write)			GetProcAddress(hardsiddll, "HardSID_Write");
+	HardSID_ReadFromHardSID = (lpReadFromHardSID)		GetProcAddress(hardsiddll, "HardSID_ReadFromHardSID");
+	HardSID_Version			= (lpHardSID_Version)		GetProcAddress(hardsiddll, "HardSID_Version");
+	HardSID_Devices			= (lpHardSID_Devices)		GetProcAddress(hardsiddll, "HardSID_Devices");
+	HardSID_GetSerial		= (lpHardSID_GetSerial)		GetProcAddress(hardsiddll, "HardSID_GetSerial");
+	HardSID_SetSIDType		= (lpHardSID_SetSIDType)	GetProcAddress(hardsiddll, "HardSID_SetSIDType");
+	HardSID_GetSIDType		= (lpHardSID_GetSIDType)	GetProcAddress(hardsiddll, "HardSID_GetSIDType");
+    HardSID_SetSerial		= (lpHardSID_SetSerial)		GetProcAddress(hardsiddll, "HardSID_SetSerial");
+	HardSID_Try_Write		= (lpHardSID_Try_Write)		GetProcAddress(hardsiddll, "HardSID_Try_Write");
+	HardSID_SoftFlush		= (lpHardSID_SoftFlush)		GetProcAddress(hardsiddll, "HardSID_SoftFlush");
+
 #endif
 	
 	// check version & device count
@@ -283,7 +368,7 @@ int main(int argc, const char * argv[]) {
 		for (;;) {
 			int choice = 0;
 			choice = show_menue();
-			if ((choice == 9) || (choice > 5)) break;
+			if ((choice == 9) || (choice > 6)) break;
 			switch (choice) {
 			case 1: list_devices(Number_Of_Devices);
 				break;
@@ -294,6 +379,9 @@ int main(int argc, const char * argv[]) {
             case 4: set_the_serial(Number_Of_Devices);
                     break;
 			case 5: windows_fix(Number_Of_Devices);
+				break;
+			case 6: fpga_test(Number_Of_Devices);
+				break;
 			default:
 				break;
 			}
