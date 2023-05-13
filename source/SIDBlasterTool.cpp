@@ -1,6 +1,6 @@
 // SIDBlastertool.cpp
-// ©2021-2022 by Andreas Schumm for crazy-midi.de
-// 2022-09-27 v1.4
+// ©2021-2023 by Andreas Schumm for crazy-midi.de
+// 2023-05-13 v1.5
 
 #include <iostream>
 #include <cstring>
@@ -37,7 +37,7 @@ enum HSID_STATES {
 
 #if defined(_WIN64) || defined(_WIN32) 
 typedef Uint8	(CALLBACK* lpHardSID_Read)(Uint8 DeviceID, int Cycles, Uint8 SID_reg);
-typedef void    (CALLBACK* lpHardSID_Write)(Uint8 DeviceID, Uint16 Cycles, Uint8 SID_reg, Uint8 Data);
+typedef void	(CALLBACK* lpHardSID_Write)(Uint8 DeviceID, Uint16 Cycles, Uint8 SID_reg, Uint8 Data);
 typedef Uint8	(CALLBACK* lpReadFromHardSID)(Uint8 DeviceID, Uint8 SID_reg);
 typedef int		(CALLBACK* lpHardSID_Version)(void);
 typedef int		(CALLBACK* lpHardSID_Devices)(void);
@@ -46,7 +46,7 @@ typedef int		(CALLBACK* lpHardSID_SetSIDType)(Uint8 DeviceID, int sidtype);
 typedef int		(CALLBACK* lpHardSID_GetSIDType)(Uint8 DeviceID);
 typedef int		(CALLBACK* lpHardSID_SetSerial)(Uint8 DeviceID, const char *SerialNo);
 typedef Uint8	(CALLBACK* lpHardSID_Try_Write)(Uint8 DeviceID, Uint16 Cycles, Uint8 SID_reg, Uint8 Data);
-typedef void    (CALLBACK* lpHardSID_SoftFlush)(Uint8 DeviceID);
+typedef void	(CALLBACK* lpHardSID_SoftFlush)(Uint8 DeviceID);
 
 lpHardSID_Read			HardSID_Read			= NULL;
 lpHardSID_Write			HardSID_Write			= NULL;
@@ -116,7 +116,7 @@ void list_devices(int No_Of_Dev) {
 	
 	for (Uint8 i = 0; i < No_Of_Dev; i++) {
 		char serial[9];
-        HardSID_GetSerial(serial, 9,(Uint8)i);
+		HardSID_GetSerial(serial, 9,(Uint8)i);
 		cout << "Device No. " << (int)i << " Serial: " << serial;
 		cout << "  SIDType: " << HardSID_GetSIDType(i);
 		switch (HardSID_GetSIDType(i)){
@@ -141,12 +141,15 @@ void read_test(int No_Of_Dev) {
 				Sleep(3);
 			}
 #if defined(_WIN64) || defined(_WIN32) 
-			for (double x = 0.0 ; x <= 20; x=x+0.025) {
+			cout << "Wait, I am busy" << endl;
+			for (double x = 0.0; x <= 20; x = x + 0.025) {
 				double summe = 0.0;
 				for (int z = 0; z <= 2047; z++) {
 					StartCounter();
 					//HardSID_Write(i, 0, 0, 0x00);
-					Uint8 result = HardSID_Read(i, 0, 25);
+					//HardSID_Write(i, 0, 0, 0x00);
+
+					Uint8 result = HardSID_Read(i, 0, 27);
 					auto ReadTime = GetCounter();
 					summe = summe + ReadTime;
 					SleepShort(x);
@@ -172,7 +175,7 @@ void set_the_type(int No_Of_Dev) {
 	int Dev_To_Prog = 0;
 	int Prog_Type = 0;
 	char sure;
-    int error_code = 0;
+	int error_code = 0;
 	
 	list_devices(No_Of_Dev);
 	
@@ -186,18 +189,18 @@ void set_the_type(int No_Of_Dev) {
 	
 	if (sure == 'y' && (Prog_Type <= 2 && Prog_Type >= 0) && (Dev_To_Prog< No_Of_Dev)) {
 		error_code = HardSID_SetSIDType(Dev_To_Prog, SID_TYPE(Prog_Type));
-        
-        if (error_code){
-            cout << "function reports error!" << endl;
-        }
-        else{
-            cout << "well, done!" << endl;
-        }
+
+		if (error_code){
+			cout << "function reports error!" << endl;
+		}
+		else{
+			cout << "well, done!" << endl;
+		}
 		cout << endl;
 		cout << "*************************************************" << endl;
 		cout << " done! exit tool and reconnect SIDBlaster!!!!!! *" << endl;
 		cout << "*************************************************" << endl;
-        
+
 	}
 	else {
 		cout << "cancel..." << endl;
@@ -205,19 +208,19 @@ void set_the_type(int No_Of_Dev) {
 }
 
 void set_the_serial(int No_Of_Dev) {
-    int Dev_To_Prog = 0;
-    char new_serial[9];
-    char sure;
-    int error_code = 0;
+	int Dev_To_Prog = 0;
+	char new_serial[9];
+	char sure;
+	int error_code = 0;
 	string s_new_serial;
 
-    list_devices(No_Of_Dev);
-    
-    cout << endl;
-    cout << "which device? (No.)" << endl;
-    cin >> Dev_To_Prog;
-    cout << "enter serial (8 digits, capital letters or numbers):" << endl;
-    cin >> s_new_serial;
+	list_devices(No_Of_Dev);
+
+	cout << endl;
+	cout << "which device? (No.)" << endl;
+	cin >> Dev_To_Prog;
+	cout << "enter serial (8 digits, capital letters or numbers):" << endl;
+	cin >> s_new_serial;
 	
 	std::string regExprStr("([A-Z]|\\d){8}"); // regular expression
 	std::regex rgx(regExprStr); // regular expression holder
@@ -309,10 +312,10 @@ int show_menue(void) {
 	cout << "1 list sidblasters" << endl;
 	cout << "2 read test" << endl;
 	cout << "3 set sid type" << endl;
-    cout << "4 set serial" << endl;
+	cout << "4 set serial" << endl;
 	cout << "5 windows driver fix" << endl;
 	cout << "6 FPGA SID Test" << endl;
-    cout << "9 exit" << endl;
+	cout << "9 exit" << endl;
 	cin >> choice;
 	if (!(choice >= 1 && choice <= 9)) choice = 9;
 	return choice;
@@ -321,7 +324,7 @@ int show_menue(void) {
 
 int main(int argc, const char * argv[]) {
 
-	cout << "*** SIDBlasterTool 1.4 by A. Schumm for crazy-midi.de" << endl;
+	cout << "*** SIDBlasterTool 1.5 by A. Schumm for crazy-midi.de" << endl;
 	cout << endl;
 	
 #if defined(_WIN64) || defined(_WIN32) 
