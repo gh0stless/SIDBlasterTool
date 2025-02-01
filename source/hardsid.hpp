@@ -4,13 +4,13 @@
 extern "C" {
 #endif
 
-enum {  HSID_USB_WSTATE_OK = 1, HSID_USB_WSTATE_BUSY, HSID_USB_WSTATE_ERROR, HSID_USB_WSTATE_END};
+//enum {  HSID_USB_WSTATE_OK = 1, HSID_USB_WSTATE_BUSY, HSID_USB_WSTATE_ERROR, HSID_USB_WSTATE_END};
 
 typedef unsigned char Uint8;
 typedef unsigned short Uint16;
 typedef unsigned char boolean;
 
-void HardSID_Uninitialize();
+void HardSID_Uninitialize(void);
 
 Uint8 HardSID_Read(Uint8 DeviceID, int Cycles, Uint8 SID_reg);
 

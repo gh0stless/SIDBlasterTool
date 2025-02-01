@@ -11,7 +11,11 @@
 
 
 #if defined(_WIN64) || defined(_WIN32)
-#include <windows.h>
+	#include <windows.h>
+	#define SLEEP(ms) Sleep(ms)
+#else
+    #include <unistd.h>
+    #define SLEEP(ms) usleep((ms) * 1000)
 #endif
 
 #include <inttypes.h>
@@ -138,7 +142,7 @@ void read_test(int No_Of_Dev) {
 			for (Uint8 j = 25; j <= 28; j++) {
 				Uint8 result = HardSID_Read(i, 0, j);
 				cout << "SIDBlaster No. " << (int)i << " Register: " << (int)j << " returns: " << (int)result << endl;
-				Sleep(3);
+				SLEEP(3);
 			}
 #if defined(_WIN64) || defined(_WIN32) 
 			cout << "Wait, I am busy" << endl;
@@ -166,7 +170,7 @@ void fpga_test(int No_Of_Dev) {
 	for (Uint8 i = 0; i < No_Of_Dev; i++) {
 		push_event(i, 25, 0xEE);
 		push_event(i, 26, 0xAB);
-		Sleep(20);
+		SLEEP(20);
 		cout << "SIDBlaster No. " << (int)i << " result: " << (int) HardSID_Read(i, 0, 0) << ":" << (int)HardSID_Read(i, 0, 1) << endl;
 	}
 }
