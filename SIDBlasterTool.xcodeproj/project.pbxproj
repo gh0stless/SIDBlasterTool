@@ -23,7 +23,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		E163C6AC26093F700038F0AF /* SIDBlasterTool */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; name = SIDBlasterTool; path = ../Release/SIDBlasterTool; sourceTree = BUILT_PRODUCTS_DIR; };
+		E163C6AC26093F700038F0AF /* SIDBlasterTool */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = SIDBlasterTool; sourceTree = BUILT_PRODUCTS_DIR; };
 		E166D18226191E1F00D9F823 /* hardsid.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = hardsid.hpp; path = source/hardsid.hpp; sourceTree = SOURCE_ROOT; };
 		E166D18326191E1F00D9F823 /* SIDBlasterTool.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SIDBlasterTool.cpp; path = source/SIDBlasterTool.cpp; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
@@ -249,8 +249,8 @@
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
 				EXCLUDED_ARCHS = "";
-				MACOSX_DEPLOYMENT_TARGET = 10.9;
-				ONLY_ACTIVE_ARCH = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.12;
+				ONLY_ACTIVE_ARCH = NO;
 				OTHER_LDFLAGS = /usr/local/lib/libhardsid.dylib;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SYMROOT = build;
@@ -262,8 +262,9 @@
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
 				EXCLUDED_ARCHS = "";
-				MACOSX_DEPLOYMENT_TARGET = 10.9;
-				ONLY_ACTIVE_ARCH = YES;
+				"EXCLUDED_ARCHS[sdk=*]" = "";
+				MACOSX_DEPLOYMENT_TARGET = 10.12;
+				ONLY_ACTIVE_ARCH = NO;
 				OTHER_LDFLAGS = /usr/local/lib/libhardsid.dylib;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SYMROOT = build;
