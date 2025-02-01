@@ -1,6 +1,6 @@
 // SIDBlastertool.cpp
-// ©2021-2023 by Andreas Schumm for crazy-midi.de
-// 2023-05-13 v1.5
+// ©2021-2025 by Andreas Schumm for crazy-midi.de
+// 2025-02-01 v1.6
 
 #include <iostream>
 #include <cstring>
@@ -310,11 +310,11 @@ int show_menue(void) {
 	cout << endl;
 	cout << "enter:" << endl;
 	cout << "1 list sidblasters" << endl;
-	cout << "2 read test" << endl;
+	cout << "2 read test (completely useless)" << endl;
 	cout << "3 set sid type" << endl;
 	cout << "4 set serial" << endl;
 	cout << "5 windows driver fix" << endl;
-	cout << "6 FPGA SID Test" << endl;
+	cout << "6 FPGA SID Test (completely useless)" << endl;
 	cout << "9 exit" << endl;
 	cin >> choice;
 	if (!(choice >= 1 && choice <= 9)) choice = 9;
@@ -324,7 +324,7 @@ int show_menue(void) {
 
 int main(int argc, const char * argv[]) {
 
-	cout << "*** SIDBlasterTool 1.5 by A. Schumm for crazy-midi.de" << endl;
+	cout << "*** SIDBlasterTool 1.6 by A. Schumm for crazy-midi.de" << endl;
 	cout << endl;
 	
 #if defined(_WIN64) || defined(_WIN32) 

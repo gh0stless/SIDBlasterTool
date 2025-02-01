@@ -20,7 +20,6 @@ mono_crash.*
 [Dd]ebug/
 [Dd]ebugPublic/
 [Rr]elease/
-[Rr]eleases/
 [Aa][Rr][Mm]/
 [Aa][Rr][Mm]64/
 bld/
